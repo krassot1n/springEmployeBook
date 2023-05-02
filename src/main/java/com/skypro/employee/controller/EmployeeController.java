@@ -1,7 +1,6 @@
 package com.skypro.employee.controller;
 
 import com.skypro.employee.model.Employee;
-import com.skypro.employee.reecord.EmployeeRequest;
 import com.skypro.employee.service.EmployeeService;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,6 +16,7 @@ import java.util.Collection;
  * DELETE - удаление ресурсов
  */
 @RestController
+@RequestMapping("/emloyees")
 public class EmployeeController {
     private final EmployeeService employeeService;
 
@@ -24,18 +24,28 @@ public class EmployeeController {
         this.employeeService = employeeService;
     }
 
-    @GetMapping("/emloyees")
+    @GetMapping()
     public Collection<Employee> getAllEmployees() {
         return this.employeeService.getAllEmployees();
-
     }
 
-    @PostMapping("/employees")
-    public Employee createEmployee(@RequestBody EmployeeRequest employeeRequest) {
-        return this.employeeService.addEmployee(employeeRequest);
+    @GetMapping("/add")
+    public Employee add(@RequestParam ("firstName") String firstName,
+                              @RequestParam ("lastName") String lastName) {
+
+        return employeeService.addEmployee(firstName,lastName);
+
     }
-    @DeleteMapping("/employees/remove")
-    public void removeEmployee(@RequestParam ){
+    @GetMapping("/remove")
+    public Employee remove(@RequestParam("firstName") String firstName,
+                           @RequestParam("lastName") String lastName) {
+
+        return employeeService.removeEmployee(firstName,lastName);
+    }
+    @GetMapping("/find")
+    public Employee find(@RequestParam(value = "firstName") String firstName,
+                         @RequestParam(value = "lastName") String lastName) {
+        return employeeService.findEmployee(firstName,lastName);
     }
 
 }

@@ -1,0 +1,9 @@
+### Получить всех сотрудников
+GET http://localhost:8080/emloyees
+
+### Создать сотрудника 2
+GET http://localhost:8080/employees/add?firstName=Ivan&lastName=Ivanov
+
+### Удалить сотрудика
+GET http://localhost:8080/emloyees/remove?firstName=Ivan&lastName=Ivanov
+
