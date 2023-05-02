@@ -1,12 +1,10 @@
 package com.skypro.employee.controller;
 
-import com.skypro.employee.exceptions.EmployeeAlreadyAddedException;
-import com.skypro.employee.exceptions.EmployeeNotFoundException;
-import com.skypro.employee.exceptions.EmployeeStorageIsFullException;
 import com.skypro.employee.model.Employee;
 import com.skypro.employee.service.EmployeeService;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collection;
 
 
 /**
@@ -26,48 +24,28 @@ public class EmployeeController {
         this.employeeService = employeeService;
     }
 
-    @GetMapping("/getAll")
-    public String getAllEmployees() {
-        return this.employeeService.getAllEmployees().toString();
+    @GetMapping()
+    public Collection<Employee> getAllEmployees() {
+        return this.employeeService.getAllEmployees();
     }
 
     @GetMapping("/add")
-    public String addEmployee(@RequestParam ("firstName") String firstName,
+    public Employee add(@RequestParam ("firstName") String firstName,
                               @RequestParam ("lastName") String lastName) {
-        Employee employee = new Employee(firstName,lastName);
-        try {
-            employeeService.add(employee);
-        } catch (EmployeeStorageIsFullException e) {
-            throw new RuntimeException("Коллекция сотрудников переполнена");
-        } catch (EmployeeAlreadyAddedException e) {
-            throw new RuntimeException("В коллекции уже есть такой сотрудник");
-        }
-        return "сотрудник " + firstName + " " + lastName + " добавлен";
+
+        return employeeService.addEmployee(firstName,lastName);
 
     }
     @GetMapping("/remove")
-    public String removeEmployee(@RequestParam("firstName") String firstName,
-                                 @RequestParam("lastName") String lastName) {
-        Employee employee = new Employee(firstName, lastName);
-        try {
-            employeeService.remove(employee);
-        } catch (EmployeeNotFoundException e) {
-            throw new RuntimeException("Удаление не выполнено, такой сотрудник не существует");
-        }
-        return "сотрудник " + firstName + " " + lastName + " удален";
+    public Employee remove(@RequestParam("firstName") String firstName,
+                           @RequestParam("lastName") String lastName) {
+
+        return employeeService.removeEmployee(firstName,lastName);
     }
     @GetMapping("/find")
-    public String findEmployee(@RequestParam(value = "firstName") String firstName,
-                               @RequestParam(value = "lastName") String lastName
-    ) {
-        Employee employee = new Employee(firstName, lastName);
-        try {
-            employeeService.find(employee);
-        } catch (EmployeeNotFoundException e) {
-            throw new RuntimeException(" Сотрудник с таким именем не найден.");
-
-        }
-        return "Сотрудник найден: " + employeeService.find(employee);
+    public Employee find(@RequestParam(value = "firstName") String firstName,
+                         @RequestParam(value = "lastName") String lastName) {
+        return employeeService.findEmployee(firstName,lastName);
     }
 
 }

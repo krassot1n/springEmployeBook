@@ -10,43 +10,41 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 
 @Service
-public class EmployeeService {
+public class EmployeeService implements EmployeeServiceImpl {
     int maxSize = 3;
     private final List<Employee> employees = new ArrayList<>(maxSize);
 
-    public List<Employee> getAllEmployees() {
-        return employees;
+    public Collection<Employee> getAllEmployees() {
+        return Collections.unmodifiableCollection(employees);
     }
 
-    public void add(Employee employee) {
-        if (employees.size() > maxSize) {
+    public Employee addEmployee(String firstName, String lastName) {
+        Employee employee = new Employee(firstName, lastName);
+        if (employees.size() >= maxSize) {
             throw new EmployeeStorageIsFullException();
         }
-        for (Employee em : employees) {
-            if (em.equals(employee)) {
-                throw new EmployeeAlreadyAddedException();
-            }
-        }
+        if (employees.contains(employee))
+            throw new EmployeeAlreadyAddedException("В коллекции уже есть такой сотрудник ");
+
         employees.add(employee);
-
-    }
-
-    public Employee remove(Employee employee) {
-        for (int i = 0; i < employees.size(); i++) {
-            if (employees.get(i).equals(employee)) {
-                employees.remove(i);
-            } else {
-                throw new EmployeeNotFoundException();
-            }
-        }
         return employee;
     }
 
-    public Employee find(Employee employee) {
-        for (Employee emp : employees) {
-            if (emp.equals(employee)) {
-                return emp;
-            }
+    @Override
+    public Employee removeEmployee(String firstname, String lastName) {
+        Employee employee = new Employee(firstname, lastName);
+        if (employees.contains(employee)) {
+            employees.remove(employee);
+            return employee;
+        }
+        throw new EmployeeNotFoundException("Удаление не возможно-сотрудник не найден");
+    }
+
+    @Override
+    public Employee findEmployee(String firstname, String lastName) {
+        Employee employee = new Employee(firstname, lastName);
+        if (employees.contains(employee)) {
+            return employee;
         }
         throw new EmployeeNotFoundException();
     }
