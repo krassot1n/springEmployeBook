@@ -1,36 +1,53 @@
 package com.skypro.employee.service;
 
+import com.skypro.employee.exceptions.EmployeeAlreadyAddedException;
+import com.skypro.employee.exceptions.EmployeeNotFoundException;
+import com.skypro.employee.exceptions.EmployeeStorageIsFullException;
 import com.skypro.employee.model.Employee;
-import com.skypro.employee.reecord.EmployeeRequest;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class EmployeeService {
-    private final Map<Integer, Employee> employees = new HashMap<>();
-    public void removeEmployee(EmployeeRequest employeeRequest){
-        this.employees.values().remove(employeeRequest);
+    int maxSize = 3;
+    private final List<Employee> employees = new ArrayList<>(maxSize);
+
+    public List<Employee> getAllEmployees() {
+        return employees;
     }
 
-    public Collection<Employee> getAllEmployees() {
-        return this.employees.values();
-    }
-
-    public Employee addEmployee(@NotNull EmployeeRequest employeeRequest) {
-        if (employeeRequest.getFirstName() == null || employeeRequest.getLastName() == null) {
-            throw new IllegalArgumentException("Employee name should be set");
+    public void add(Employee employee) {
+        if (employees.size() > maxSize) {
+            throw new EmployeeStorageIsFullException();
         }
-        Employee employee = new Employee(employeeRequest.getFirstName(),
-                employeeRequest.getLastName(),
-                employeeRequest.getDepartment(),
-                employeeRequest.getSalary());
-        this.employees.put(employee.getId(), employee);
-        return employee;
+        for (Employee em : employees) {
+            if (em.equals(employee)) {
+                throw new EmployeeAlreadyAddedException();
+            }
+        }
+        employees.add(employee);
 
+    }
+
+    public Employee remove(Employee employee) {
+        for (int i = 0; i < employees.size(); i++) {
+            if (employees.get(i).equals(employee)) {
+                employees.remove(i);
+            } else {
+                throw new EmployeeNotFoundException();
+            }
+        }
+        return employee;
+    }
+
+    public Employee find(Employee employee) {
+        for (Employee emp : employees) {
+            if (emp.equals(employee)) {
+                return emp;
+            }
+        }
+        throw new EmployeeNotFoundException();
     }
 }
